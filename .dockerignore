@@ -1,0 +1,16 @@
+node_modules
+.git
+.DS_Store
+*.log
+.venv
+__pycache__
+*.pyc
+dist
+.angular
+media
+staticfiles_build
+db.sqlite3
+.env
+.dev.vars
+.idea
+.pytest_cache

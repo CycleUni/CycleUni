@@ -1,0 +1,101 @@
+name: cycleuni
+
+services:
+  db:
+    image: postgres:16-alpine
+    env_file: .env.docker
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE:-cycleuni}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cycleuni} -d ${POSTGRES_DATABASE:-cycleuni}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    env_file: .env.docker
+    environment:
+      DJANGO_READ_DOT_ENV_FILE: "0"
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:4200}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
+      POSTGRES_HOST: db
+      POSTGRES_SSLMODE: "disable"
+      DB_PORT: "5432"
+      REDIS_URL: redis://redis:6379/0
+      EDGE_CHAT_URL: ${EDGE_CHAT_URL:-http://cfedgechat:8787}
+      EDGE_CHAT_APP_ID: ${EDGE_CHAT_APP_ID:-cycleuni}
+      DEFAULT_SUPERUSER_FIRST_NAME: ${DEFAULT_SUPERUSER_FIRST_NAME:-Admin}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./CycleUni-BE:/app
+    working_dir: /app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    env_file: .env.docker
+    environment:
+      NG_APP_BACKEND_URL: ${NG_APP_BACKEND_URL:-http://localhost:8000/api/v1}
+      NG_APP_ALLOWED_HOSTS: ${NG_APP_ALLOWED_HOSTS:-localhost,127.0.0.1,frontend}
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./CycleUni-FE/src:/app/src
+      - ./CycleUni-FE/scripts:/app/scripts
+      - ./CycleUni-FE/public:/app/public
+      - ./CycleUni-FE/angular.json:/app/angular.json
+      - ./CycleUni-FE/package.json:/app/package.json
+      - ./CycleUni-FE/tsconfig.json:/app/tsconfig.json
+      - ./CycleUni-FE/tsconfig.app.json:/app/tsconfig.app.json
+      - ./CycleUni-FE/nodemon.json:/app/nodemon.json
+    working_dir: /app
+    depends_on:
+      - backend
+
+  cfedgechat:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.cfedgechat
+    env_file: .env.docker
+    environment:
+      DJANGO_WEBHOOK_URL: ${DJANGO_WEBHOOK_URL:-http://backend:8000/api/v1/messaging/webhook/edge-chat/}
+      APP_ORIGINS: ${APP_ORIGINS:-http://localhost:4200,http://127.0.0.1:4200}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8787:8787"
+    volumes:
+      - ./CFEdgeChat/src:/app/src
+      - ./CFEdgeChat/wrangler.toml:/app/wrangler.toml
+      - ./CFEdgeChat/package.json:/app/package.json
+      - ./CFEdgeChat/tsconfig.json:/app/tsconfig.json
+    working_dir: /app
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -1,0 +1,14 @@
+FROM node:24.15.0-bookworm-slim
+
+WORKDIR /app
+
+COPY docker/entrypoint.frontend.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+COPY CycleUni-FE/package.json CycleUni-FE/package-lock.json ./
+ENV PUPPETEER_SKIP_DOWNLOAD=1
+RUN npm install --ignore-scripts
+
+EXPOSE 4200
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
