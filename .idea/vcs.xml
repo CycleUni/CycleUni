@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/CFEdgeChat" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/CycleUni-BE" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/CycleUni-FE" vcs="Git" />
+  </component>
+</project>
