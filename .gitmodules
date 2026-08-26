@@ -7,3 +7,6 @@
 [submodule "CFEdgeChat"]
 	path = CFEdgeChat
 	url = https://github.com/CycleUni/CFEdgeChat
+[submodule "ISBN Search Proxy/ISBNnet Resolver"]
+	path = ISBN Search Proxy/ISBNnet Resolver
+	url = https://github.com/CycleUni/ISBNnet-Resolver
