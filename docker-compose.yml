@@ -45,6 +45,7 @@ services:
       EDGE_CHAT_URL: ${EDGE_CHAT_URL:-http://localhost:8787}
       EDGE_CHAT_APP_ID: ${EDGE_CHAT_APP_ID:-cycleuni}
       DEFAULT_SUPERUSER_FIRST_NAME: ${DEFAULT_SUPERUSER_FIRST_NAME:-Admin}
+      ISBNNET_RESOLVER_URL: ${ISBNNET_RESOLVER_URL:-http://isbnnet-resolver:8789}
     ports:
       - "8000:8000"
     volumes:
@@ -55,6 +56,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      isbnnet-resolver:
+        condition: service_started
 
   frontend:
     build:
@@ -75,9 +78,24 @@ services:
       - ./CycleUni-FE/tsconfig.json:/app/tsconfig.json
       - ./CycleUni-FE/tsconfig.app.json:/app/tsconfig.app.json
       - ./CycleUni-FE/nodemon.json:/app/nodemon.json
+      - ./CycleUni-FE/functions:/app/functions
+      - ./CycleUni-FE/wrangler.toml:/app/wrangler.toml
+      - ./CycleUni-FE/proxy.conf.json:/app/proxy.conf.json
     working_dir: /app
     depends_on:
       - backend
+
+  isbnnet-resolver:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.isbnnet-resolver
+    ports:
+      - "8789:8789"
+    volumes:
+      - "./ISBN Search Proxy/ISBNnet Resolver/src:/app/src"
+      - "./ISBN Search Proxy/ISBNnet Resolver/wrangler.toml:/app/wrangler.toml"
+      - "./ISBN Search Proxy/ISBNnet Resolver/tsconfig.json:/app/tsconfig.json"
+      - "./ISBN Search Proxy/ISBNnet Resolver/package.json:/app/package.json"
 
   cfedgechat:
     build:

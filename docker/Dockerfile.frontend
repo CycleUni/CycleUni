@@ -1,5 +1,12 @@
 FROM node:24.15.0-bookworm-slim
 
+# See docker/Dockerfile.isbnnet-resolver for why this is needed: the -slim
+# base image has no system CA bundle, which breaks HTTPS fetches made by the
+# wrangler pages dev / workerd runtime this container now also runs (for the
+# functions/api/cover.ts image proxy).
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY docker/entrypoint.frontend.sh /usr/local/bin/entrypoint.sh

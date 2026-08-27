@@ -1,0 +1,23 @@
+FROM node:24.15.0-bookworm-slim
+
+# The -slim base image ships with no system CA bundle at all (no
+# /etc/ssl/certs/ca-certificates.crt). Node's own bundled root store covers
+# this transparently, but wrangler's workerd runtime consults the system
+# trust store and, finding none, falls back to a much smaller built-in set
+# that excludes some legitimate public CAs (observed: Taiwan's TWCA Global
+# Root CA, used by isbn.ncl.edu.tw) — causing otherwise-valid HTTPS fetches
+# from the Worker to fail with "self signed certificate in certificate chain".
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY docker/entrypoint.isbnnet-resolver.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+COPY ["ISBN Search Proxy/ISBNnet Resolver/package.json", "ISBN Search Proxy/ISBNnet Resolver/package-lock.json", "./"]
+RUN npm install
+
+EXPOSE 8789
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
