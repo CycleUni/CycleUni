@@ -6,9 +6,19 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": [
         "-c",
-        "cd /Users/kenchou2006/Documents/GitHub/CycleUni/CycleUni-FE && npm start"
+        "cd CycleUni-FE && npm start"
       ],
       "port": 4200,
+      "autoPort": false
+    },
+    {
+      "name": "frontend-pages-functions",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd CycleUni-FE && npx wrangler pages dev dist/cycleuni-fe/browser --port 8788"
+      ],
+      "port": 8788,
       "autoPort": false
     },
     {
@@ -16,7 +26,7 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": [
         "-c",
-        "cd /Users/kenchou2006/Documents/GitHub/CycleUni/CycleUni-BE && .venv/bin/python manage.py runserver 8000"
+        "cd CycleUni-BE && .venv/bin/python manage.py runserver 8000"
       ],
       "port": 8000
     },
@@ -25,7 +35,7 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": [
         "-c",
-        "cd /Users/kenchou2006/Documents/GitHub/CycleUni/CFEdgeChat && npm start"
+        "cd CFEdgeChat && npm start"
       ],
       "port": 8787
     },
@@ -34,7 +44,7 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": [
         "-c",
-        "cd \"/Users/kenchou2006/Documents/GitHub/CycleUni/ISBN Search Proxy/ISBNnet Resolver\" && npm run dev -- --port 8789"
+        "cd \"ISBN Search Proxy/ISBNnet Resolver\" && npm run dev -- --port 8789"
       ],
       "port": 8789
     }
