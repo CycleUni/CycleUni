@@ -1,6 +1,6 @@
 # UniBooks 本地 Docker 開發環境
 
-讓 `CycleUni-BE`（Django 後端）、`CycleUni-FE`（Angular 22 前端）、`CFEdgeChat`（Cloudflare Workers 即時聊天微服務）三個專案一鍵在本地 Docker 中運行。
+讓 `UniBooks-BE`（Django 後端）、`UniBooks-FE`（Angular 22 前端）、`CFEdgeChat`（Cloudflare Workers 即時聊天微服務）三個專案一鍵在本地 Docker 中運行。
 
 ## 結構
 
@@ -16,8 +16,8 @@ UniBooks/                       <- 本倉庫（submodule 容器）
 │   ├── entrypoint.backend.sh
 │   ├── entrypoint.frontend.sh
 │   └── entrypoint.cfedgechat.sh
-├── CycleUni-BE/                <- submodule（github.com/CycleUni/CycleUni-BE）
-├── CycleUni-FE/                <- submodule（github.com/CycleUni/CycleUni-FE）
+├── UniBooks-BE/                <- submodule（github.com/CycleUni/CycleUni-BE）
+├── UniBooks-FE/                <- submodule（github.com/CycleUni/CycleUni-FE）
 └── CFEdgeChat/                 <- submodule（github.com/UniBooks/CFEdgeChat）
 ```
 
@@ -69,10 +69,10 @@ docker compose down -v
 
 ## 子模組更新
 
-由於源碼是 bind-mount 進容器（在 `docker-compose.yml` 用 `./CycleUni-BE:/app`），本地修改會即時生效（無需重啟）。要拉取上游更新：
+由於源碼是 bind-mount 進容器（在 `docker-compose.yml` 用 `./UniBooks-BE:/app`），本地修改會即時生效（無需重啟）。要拉取上游更新：
 
 ```bash
-git submodule update --remote CycleUni-BE
+git submodule update --remote UniBooks-BE
 ```
 
 ## 自訂環境變數
@@ -89,7 +89,7 @@ docker compose up
 
 ## 管理員帳號
 
-Django 的 `accounts.apps._create_default_superuser` 只在 `DEBUG=False` 時觸發（見 `CycleUni-BE/accounts/apps.py:33`），而本地 docker 環境預設 `DEBUG=True`，所以管理員帳號**不會**自動建立。
+Django 的 `accounts.apps._create_default_superuser` 只在 `DEBUG=False` 時觸發（見 `UniBooks-BE/accounts/apps.py:33`），而本地 docker 環境預設 `DEBUG=True`，所以管理員帳號**不會**自動建立。
 
 第一次啟動後手動建立：
 
