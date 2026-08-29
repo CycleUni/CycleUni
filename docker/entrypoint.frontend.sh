@@ -15,7 +15,7 @@ echo "Building static assets for Pages Functions dev server..."
 npx ng build --configuration smoke
 
 echo "Starting Cloudflare Pages Functions dev server (image/cover proxy) on :8788..."
-npx wrangler pages dev dist/cycleuni-fe/browser --port 8788 --ip 0.0.0.0 &
+npx wrangler pages dev dist/unibooks-fe/browser --port 8788 --ip 0.0.0.0 &
 
 echo "Starting Angular dev server..."
 exec npx ng serve --host 0.0.0.0 --port 4200 --proxy-config proxy.conf.json

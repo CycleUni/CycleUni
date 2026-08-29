@@ -16,8 +16,8 @@ UniBooks/                       <- 本倉庫（submodule 容器）
 │   ├── entrypoint.backend.sh
 │   ├── entrypoint.frontend.sh
 │   └── entrypoint.cfedgechat.sh
-├── UniBooks-BE/                <- submodule（github.com/CycleUni/CycleUni-BE）
-├── UniBooks-FE/                <- submodule（github.com/CycleUni/CycleUni-FE）
+├── UniBooks-BE/                <- submodule（github.com/CycleUni/UniBooks-BE）
+├── UniBooks-FE/                <- submodule（github.com/CycleUni/UniBooks-FE）
 └── CFEdgeChat/                 <- submodule（github.com/UniBooks/CFEdgeChat）
 ```
 
