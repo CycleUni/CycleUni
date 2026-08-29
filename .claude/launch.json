@@ -16,7 +16,7 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": [
         "-c",
-        "cd CycleUni-FE && npx wrangler pages dev dist/cycleuni-fe/browser --port 8788"
+        "cd CycleUni-FE && npx wrangler pages dev dist/unibooks-fe/browser --port 8788"
       ],
       "port": 8788,
       "autoPort": false

@@ -1,11 +1,11 @@
-# CycleUni 本地 Docker 開發環境
+# UniBooks 本地 Docker 開發環境
 
 讓 `CycleUni-BE`（Django 後端）、`CycleUni-FE`（Angular 22 前端）、`CFEdgeChat`（Cloudflare Workers 即時聊天微服務）三個專案一鍵在本地 Docker 中運行。
 
 ## 結構
 
 ```
-CycleUni/                       <- 本倉庫（submodule 容器）
+UniBooks/                       <- 本倉庫（submodule 容器）
 ├── .env.docker                 <- 所有服務共用的環境變數範本
 ├── .dockerignore
 ├── docker-compose.yml          <- Docker Compose 編配
@@ -18,7 +18,7 @@ CycleUni/                       <- 本倉庫（submodule 容器）
 │   └── entrypoint.cfedgechat.sh
 ├── CycleUni-BE/                <- submodule（github.com/CycleUni/CycleUni-BE）
 ├── CycleUni-FE/                <- submodule（github.com/CycleUni/CycleUni-FE）
-└── CFEdgeChat/                 <- submodule（github.com/CycleUni/CFEdgeChat）
+└── CFEdgeChat/                 <- submodule（github.com/UniBooks/CFEdgeChat）
 ```
 
 **原始三個專案保持完全乾淨** — 所有 Docker 設定檔都只放在本倉庫內。
@@ -55,7 +55,7 @@ docker compose logs -f frontend
 # 進入容器
 docker compose exec backend python manage.py createsuperuser
 docker compose exec backend python manage.py shell
-docker compose exec db psql -U cycleuni -d cycleuni
+docker compose exec db psql -U unibooks -d unibooks
 
 # 重建映像（更新 Dockerfile 或依賴後）
 docker compose build --no-cache
@@ -95,7 +95,7 @@ Django 的 `accounts.apps._create_default_superuser` 只在 `DEBUG=False` 時觸
 
 ```bash
 docker compose exec backend python manage.py createsuperuser \
-  --email admin@cycleuni.com \
+  --email admin@unibooks.com \
   --first_name Admin \
   --noinput
 ```
@@ -105,7 +105,7 @@ docker compose exec backend python manage.py createsuperuser \
 ```bash
 docker compose exec backend python manage.py shell -c "
 from django.contrib.auth import get_user_model
-u = get_user_model().objects.get(email='admin@cycleuni.com')
+u = get_user_model().objects.get(email='admin@unibooks.com')
 u.set_password('admin123')
 u.save()
 print('password set')

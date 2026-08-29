@@ -1,17 +1,17 @@
-name: cycleuni
+name: unibooks
 
 services:
   db:
     image: postgres:16-alpine
     env_file: .env.docker
     environment:
-      POSTGRES_DB: ${POSTGRES_DATABASE:-cycleuni}
+      POSTGRES_DB: ${POSTGRES_DATABASE:-unibooks}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cycleuni} -d ${POSTGRES_DATABASE:-cycleuni}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-unibooks} -d ${POSTGRES_DATABASE:-unibooks}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -43,7 +43,7 @@ services:
       DB_PORT: "5432"
       REDIS_URL: redis://redis:6379/0
       EDGE_CHAT_URL: ${EDGE_CHAT_URL:-http://localhost:8787}
-      EDGE_CHAT_APP_ID: ${EDGE_CHAT_APP_ID:-cycleuni}
+      EDGE_CHAT_APP_ID: ${EDGE_CHAT_APP_ID:-unibooks}
       DEFAULT_SUPERUSER_FIRST_NAME: ${DEFAULT_SUPERUSER_FIRST_NAME:-Admin}
       ISBNNET_RESOLVER_URL: ${ISBNNET_RESOLVER_URL:-http://isbnnet-resolver:8789}
     ports:
