@@ -7,7 +7,11 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE:-unibooks}
     ports:
-      - "5432:5432"
+      # Loopback only. Published as "5432:5432" this listened on every
+      # interface, so the dev database — password `unibooks`, seeded with
+      # whatever you have been testing with — was reachable by anyone sharing
+      # the network with the laptop. psql from the host still works.
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -19,7 +23,10 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      # Loopback only, as with Postgres above — and this one takes no password
+      # at all, so an open port is an open shell into the cache (and the JWT
+      # whitelist that lives in it).
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
