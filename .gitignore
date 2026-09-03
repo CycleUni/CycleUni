@@ -1,0 +1,7 @@
+# macOS
+.DS_Store
+
+# Local overrides of .env.docker. README tells you to `cp .env.docker .env`
+# and fill in real credentials, so the copy must never be committable —
+# .env.docker itself is the template and stays tracked.
+.env
