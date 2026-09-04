@@ -1,4 +1,4 @@
-name: Submodules
+name: Composition
 
 on:
   push:
@@ -11,13 +11,14 @@ concurrency:
 
 jobs:
   resolve:
+    name: Submodule pointers resolve
     runs-on: ubuntu-latest
     steps:
       # This repository is a set of submodule pointers, and a pointer can name
       # a commit that exists only on someone's machine — a blanket `git add`
       # here is enough to do it. Nothing notices until a fresh
-      # `clone --recurse-submodules` fails, which is exactly the case this
-      # checkout reproduces: it fetches every pointer, and cannot resolve one
+      # `clone --recurse-submodules` fails, which is exactly what this
+      # checkout reproduces: it fetches every pointer and cannot resolve one
       # that was never pushed.
       #
       # Note: if any submodule repository is private, the default GITHUB_TOKEN
@@ -33,5 +34,49 @@ jobs:
           # a recursive checkout means it could not be fetched.
           if git submodule status --recursive | grep -q '^-'; then
             echo "::error::A submodule pointer could not be resolved — it likely names an unpushed commit."
+            exit 1
+          fi
+
+  contract:
+    name: Frontend renders the backend's error codes
+    runs-on: ubuntu-latest
+    steps:
+      # The frontend feeds a backend error code straight to t(), which echoes
+      # an unknown key back — so a code the dictionary does not declare reaches
+      # the user as `listing.errFileTooLarge` where a sentence belongs. 21 were
+      # in that state at once. About fifty of the dictionary's keys also exist
+      # only to serve those codes, and look like orphans without the backend.
+      #
+      # Neither question can be answered inside one repository, and answering
+      # them against the other's `main` would test a combination nobody
+      # deploys. Here the submodules are at the pinned commits — the
+      # composition that actually ships together — and the checkout lays them
+      # out as the siblings i18n-keys.spec.ts expects.
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: UniBooks-FE/package-lock.json
+
+      - run: npm ci
+        working-directory: UniBooks-FE
+
+      - name: i18n contract
+        working-directory: UniBooks-FE
+        # `shell: bash` for pipefail: without it a failing run piped into tee
+        # would report tee's exit code, which is always 0.
+        shell: bash
+        run: |
+          npm test -- --include=src/app/core/i18n/i18n-keys.spec.ts 2>&1 | tee i18n.log
+
+          # Those two checks skip themselves when a sibling is missing, so a
+          # broken checkout would show as a green run that tested nothing.
+          # This job exists precisely to run them, so a skip is a failure.
+          if sed 's/\x1b\[[0-9;]*m//g' i18n.log | grep -qE "[0-9]+ skipped"; then
+            echo "::error::A cross-repository check skipped — a submodule did not check out."
             exit 1
           fi
