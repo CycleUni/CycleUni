@@ -1,0 +1,37 @@
+name: Submodules
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      # This repository is a set of submodule pointers, and a pointer can name
+      # a commit that exists only on someone's machine — a blanket `git add`
+      # here is enough to do it. Nothing notices until a fresh
+      # `clone --recurse-submodules` fails, which is exactly the case this
+      # checkout reproduces: it fetches every pointer, and cannot resolve one
+      # that was never pushed.
+      #
+      # Note: if any submodule repository is private, the default GITHUB_TOKEN
+      # cannot read it and this needs a PAT in `token:` instead.
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Every pointer resolves to a pushed commit
+        run: |
+          git submodule status --recursive | sed 's/^/  /'
+          # A leading '-' means the submodule was never initialised, which for
+          # a recursive checkout means it could not be fetched.
+          if git submodule status --recursive | grep -q '^-'; then
+            echo "::error::A submodule pointer could not be resolved — it likely names an unpushed commit."
+            exit 1
+          fi
